@@ -5,7 +5,7 @@ function root = false(f, xl, xu, tol)
       root=0;
     error = 10000; 
 
-    % تطبيق طريقة False Position
+    
     while error > tol
         xr = xl - (f(xl) * (xu - xl)) / (f(xu) - f(xl));
         error = abs((xr - root) / xr) * 100; 
