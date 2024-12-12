@@ -1,15 +1,12 @@
 function network_optimizer_gui()
-    % Create the user interface window
     f = figure('Name', 'Network Optimizer', 'NumberTitle', 'off', 'Position', [100, 100, 600, 500]);
 
-    % Add input fields for nodes and traffic demands
     uicontrol('Style', 'text', 'String', 'Nodes (x,y)', 'Position', [50, 420, 100, 20]);
     nodes_input = uicontrol('Style', 'edit', 'String', '0 0; 1 2; 3 4', 'Position', [150, 420, 200, 30]);
 
     uicontrol('Style', 'text', 'String', 'Traffic Demand', 'Position', [50, 370, 100, 20]);
     traffic_input = uicontrol('Style', 'edit', 'String', '5 3; 3 4', 'Position', [150, 370, 200, 30]);
 
-    % Add input fields for False Position method parameters
     uicontrol('Style', 'text', 'String', 'xl', 'Position', [50, 320, 100, 20]);
     xl_input = uicontrol('Style', 'edit', 'String', '1', 'Position', [150, 320, 200, 30]);
 
@@ -19,17 +16,13 @@ function network_optimizer_gui()
     uicontrol('Style', 'text', 'String', 'Tolerance', 'Position', [50, 240, 100, 20]);
     tol_input = uicontrol('Style', 'edit', 'String', '0.01', 'Position', [150, 240, 200, 30]);
 
-    % Add input field for function f
     uicontrol('Style', 'text', 'String', 'Function f(x)', 'Position', [50, 200, 100, 20]);
     f_input = uicontrol('Style', 'edit', 'String', 'x^2 - 2', 'Position', [150, 200, 200, 30]);
 
-    % Add button to trigger network optimization
     uicontrol('Style', 'pushbutton', 'String', 'Optimize Network', 'Position', [150, 150, 200, 30], 'Callback', @optimize_network);
 
-    % Create axes for network plotting
     ax = axes('Parent', f, 'Position', [0.4, 0.2, 0.55, 0.6]);
 
-    % Callback function for optimization button
     function optimize_network(~, ~)
         % Get input values from user
         nodes_str = get(nodes_input, 'String');
@@ -39,7 +32,6 @@ function network_optimizer_gui()
         tol = str2double(get(tol_input, 'String'));
         f_str = get(f_input, 'String');  % Read function f from inputs
 
-        % Convert inputs to numerical matrices
         nodes = str2num(nodes_str);
         trafficDemand = str2num(traffic_str);
 
@@ -48,10 +40,8 @@ function network_optimizer_gui()
             return;
         end
 
-        % Optimize the network
         optimizedNodes = optimizeNetwork(nodes, trafficDemand);
 
-        % Convert input text to a usable function
         try
             f = str2func(['@(x) ' f_str]);  % Convert text to function
         catch
@@ -59,7 +49,6 @@ function network_optimizer_gui()
             return;
         end
 
-        % Calculate root using False Position method
         try
             root = false(f, xl, xu, tol);
         catch ME
@@ -67,10 +56,8 @@ function network_optimizer_gui()
             return;
         end
 
-        % Display the result in the command window
         fprintf('Root found using False Position: %.4f\n', root);
 
-        % Plot the original and optimized network with calculated root
         plotNetwork(ax, nodes, optimizedNodes, root);
     end
 end
@@ -101,7 +88,6 @@ function optimizedNodes = optimizeNetwork(nodes, trafficDemand)
 end
 
 function plotNetwork(ax, nodes, optimizedNodes, root)
-    % Plot the network before and after optimization
     axes(ax);
     clf; % Clear current figure
 
@@ -134,16 +120,13 @@ function root = false(f, xl, xu, tol)
         error('f(xl) and f(xu) must have opposite signs.');
     end
     root = 0;
-    % Set initial error
     error = 10000;
 
-    % Apply False Position method
     while error > tol
         xr = xl - (f(xl) * (xu - xl)) / (f(xu) - f(xl));
-        error = abs((xr - root) / xr) * 100; % Calculate relative error
+        error = abs((xr - root) / xr) * 100; 
         root = xr;
 
-        % Update values based on sign
         if f(xr) == 0
             break;
         elseif f(xl) * f(xr) < 0
@@ -153,9 +136,7 @@ function root = false(f, xl, xu, tol)
         end
     end
 
-    % Print final relative error
     fprintf('Final Error = %.4f%%\n', error);
 
-    % Final result
     root = xr;
 end
